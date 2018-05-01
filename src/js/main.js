@@ -13,7 +13,7 @@ var data = {
 
     , where: {
         filter: {
-            status: [200]
+            status: []
             , key: ''
             , timeRange: []
         },
@@ -109,25 +109,30 @@ var ui = {
         $('.bookmarks ul').empty();
         let bookmarks = data.bookmarks.filter((bookmark) => { // 状态
             let status = data.where.filter.status;
-            return !status || status.some(bookmark.status);
+            return !status.length || status.some((s) => s === bookmark.status);
         }).filter((bookmark) => {
             let timeRange = data.where.filter.timeRange;
             let start = timeRange[0] || 0;
-            let end = timeRange[1] || 9999999999;
-            return bookmark.dateAdded > start && bookmark.dateAdded < end;
+            let end = timeRange[1] || 99999999999999;
+            console.log(bookmark.dateAdded);
+            return bookmark.dateAdded >= start && bookmark.dateAdded <= end;
         }).filter((bookmark) => {
             let key = data.where.filter.key;
-            return new RegExp(key).test(bookmark.title);
-        }).sort((b1, b2)=>{
-            return b1.dateAdded > b2.dateAdded && data.where.sort.inverse;
+            return !key || new RegExp(key).test(bookmark.title);
+        }).sort((b1, b2) => {
+            if (data.where.sort.inverse) { // 升序
+                return b1.dateAdded - b2.dateAdded;
+            }
+            return b2.dateAdded - b1.dateAdded;
         });
         bookmarks.forEach((bookmark) => {
             let time = echarts.format.formatTime('yyyy-MM-dd', bookmark.dateAdded);
-            console.log(bookmark.title, bookmark.status ? 'remove' : '');
             let html = `<li class="${(bookmark.status === 404) ? 'remove' : ''}">
-                        <span class="status ${{200: 'success', 404: 'error'}[bookmark.status]}">${bookmark.status}</span>
                         <i class="icon fa fa-bookmark"></i>
-                        <a class="bookmark" href="${bookmark.url}" target="_blank" alt="${bookmark.title}">${bookmark.title}</a>
+                        <span>
+                            <a class="bookmark" href="${bookmark.url}" target="_blank" alt="${bookmark.title}">${bookmark.title}</a>
+                            <sup class="status ${{200: 'success', 404: 'error'}[bookmark.status]}">${bookmark.status}</sup>
+                        </span>
                         <time class="float-right">${time}</time>
                     </li>`;
             $('.bookmarks ul').append(html);

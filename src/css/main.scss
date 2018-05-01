@@ -1,6 +1,7 @@
 @import "font-awesome.css";
 
 $tips-color: #717375;
+$gl-blue-color: #5185EC;
 
 * {
   margin: 0;
@@ -71,8 +72,12 @@ body.app {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: space-between;
+      // 过滤
       .filter {
         align-self: flex-start;
+        select{
+          outline: 0;
+        }
         input.search {
           outline: 0;
           margin: 0;
@@ -85,8 +90,19 @@ body.app {
           }
         }
       }
+      // 排序
       .sort {
         align-self: flex-end;
+        a,
+        a:hover,
+        a:visited,
+        a:active {
+          text-decoration: none;
+          color: $gl-blue-color;
+        }
+        a.active {
+          font-weight: bold;
+        }
       }
     }
     // 书签Box
@@ -97,11 +113,11 @@ body.app {
         margin: 5px 0;
         cursor: pointer;
         border-bottom: 1px dashed #ebebeb;
-        .status {
+        sup.status {
+          vertical-align: top;
           width: 2em;
           text-align: center;
           display: inline-block;
-          vertical-align: text-top;
           &.success {
             color: #56A55C;
           }
@@ -126,7 +142,7 @@ body.app {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width: 35em;
+            max-width: 35em;
             display: inline-block;
           }
           &:hover {
@@ -225,8 +241,8 @@ body.app {
   background-color: #fff;
   &.btn-primary {
     color: #fff;
-    background-color: #1890ff;
-    border-color: #1890ff;
+    background-color: $gl-blue-color;
+    border-color: $gl-blue-color;
   }
   &.btn-loading:before {
     display: block;
