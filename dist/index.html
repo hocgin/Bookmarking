@@ -4,60 +4,77 @@
     <meta charset="UTF-8">
     <title>整理书签</title>
     <link rel="stylesheet" href="css/main.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src="js/jquery-3.3.1.min.min.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/main.min.js"></script>
 </head>
 <body class="app">
-    <div class="background-top">
-        <div class="about">
-            <div class="qrcode">
-                <img src="http://7xs6lq.com1.z0.glb.clouddn.com/img/un/wx.pay.1000.png">
-                <p>
-                    扫一扫
-                    <br>
-                    请作者喝咖啡
-                </p>
-            </div>
+<div class="background-top">
+    <div class="about">
+        <div class="qrcode">
+            <img src="http://7xs6lq.com1.z0.glb.clouddn.com/img/un/wx.pay.1000.png">
+            <p>
+                扫一扫
+                <br>
+                请作者喝咖啡
+            </p>
         </div>
     </div>
-    <div class="content">
-        <div class="chart">
-            <h3 style="text-align: center">书签整理</h3>
-            <div style="width: 50%;">
-                <canvas id="line-chart" width="100" height="50"></canvas>
-            </div>
-            <div style="width: 50%;">
-                <canvas id="pie-chart" width="100" height="50"></canvas>
-            </div>
-        </div>
-        <div class="filters">
-            <div class="filter">
-                <input id="search" type="text" placeholder="关键字">
-            </div>
-            <div class="filter">
-                <a href="#">最新</a>/<a href="#">最旧</a>
-            </div>
-        </div>
-        <div class="bookmarks">
-            <ul>
-                <li>
-                    <i class="icon fa fa-bookmark"></i>
-                    <a class="bookmark" href="">Google</a>
-                    <time class="float-right">2014-05-12</time>
-                </li>
-                <li>
-                    <i class="icon fa fa-bookmark"></i>
-                    <a class="bookmark" href="">Google</a>
-                    <time class="float-right">2014-05-12</time>
-                </li>
-                <li class="remove">
-                    <i class="icon fa fa-bookmark"></i>
-                    <a class="bookmark" href="">Google</a>
-                    <time class="float-right">2014-05-12</time>
-                </li>
-            </ul>
+</div>
+<div class="content">
+    <div class="chart">
+        <div id="container" style="width: 100%;height:260px;"></div>
+        <div class="tool-bar">
+            <button class="btn btn-primary" id="sort-out">
+                <i class="fa fa-circle-o-notch icon-loading"></i>
+                开始扫描
+            </button>
         </div>
     </div>
+    <div class="filters">
+        <div class="filter">
+            <input id="search" class="search" type="text" placeholder="关键字">
+        </div>
+        <div class="filter">
+            <select>
+                <option value="">状态码</option>
+            </select>
+        </div>
+        <div class="filter">
+            <select>
+                <option value="">时间范围</option>
+            </select>
+        </div>
+        <div class="sort">
+            <a href="#">最新</a>/<a href="#">最旧</a>
+        </div>
+    </div>
+    <div class="bookmarks">
+        <ul>
+            <li>
+                <span class="status">200</span>
+                <i class="icon fa fa-bookmark"></i>
+                <a class="bookmark" href="">Google</a>
+                <time class="float-right">2014-05-12</time>
+            </li>
+            <li>
+                <span class="status">200</span>
+                <i class="icon fa fa-bookmark"></i>
+                <a class="bookmark" href="">Google</a>
+                <time class="float-right">2014-05-12</time>
+            </li>
+            <li class="remove">
+                <span class="status">200</span>
+                <i class="icon fa fa-bookmark"></i>
+                <a class="bookmark" href="">Google</a>
+                <time class="float-right">2014-05-12</time>
+            </li>
+        </ul>
+    </div>
+</div>
+<footer>
+</footer>
 
-    <script type="application/javascript" src="js/main.min.js"></script>
+<script type="application/javascript" src="js/main.min.js"></script>
 </body>
 </html>
