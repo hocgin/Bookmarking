@@ -1,4 +1,5 @@
 var data = {
+    debug: true,
     /**
      * {
      *  "dateAdded": 收藏时间，
@@ -30,6 +31,9 @@ var operations = {
         var that = this;
         chrome.bookmarks.getTree((marks) => {
             data.bookmarks = that.traverse(marks);
+            if (!data.bookmarks.length) {
+                progress.done();
+            }
             data.count = 0;
             that._checkUrls();
         });
@@ -46,9 +50,10 @@ var operations = {
             (node) => !!node["url"]
         ).map((node) => {
             data.bookmarks.push({
-                dateAdded: node["dateAdded"]
-                , url: node["url"]
-                , title: node["title"]
+                id: node.id
+                , dateAdded: node.dateAdded
+                , url: node.url
+                , title: node.title
                 , status: 200,
             });
         });
@@ -56,40 +61,55 @@ var operations = {
     },
     _checkUrls: function () {
         data.bookmarks.forEach((bookmark, index) => {
-            $.ajax({
-                type: "GET",
-                cache: false,
-                timeout: 5000,
-                async: true,
-                url: bookmark.url,
-                complete: (response) => {
-                    if (response.status !== 200) {
-                        let bookmark = data.bookmarks[index];
-                        bookmark.status = response.status;
-                    }
-                    progress.loading(data.count, (data.bookmarks.length - 1));
-                    if ((data.bookmarks.length - 1) === data.count) { // 全部检查完成
-                        progress.done();
-                    }
-                    data.count++;
+            console.log(data.bookmarks.length);
+            if (data.debug) {
+                let bookmark = data.bookmarks[index];
+                bookmark.status = [200, 500, 404, 0, 501][Math.floor(Math.random() * 4)];
+                progress.loading(data.count, (data.bookmarks.length - 1));
+                if ((data.bookmarks.length - 1) === data.count) { // 全部检查完成
+                    progress.done();
                 }
-            });
+                data.count++;
+            } else {
+                $.ajax({
+                    type: "GET",
+                    cache: false,
+                    timeout: 5000,
+                    async: true,
+                    url: bookmark.url,
+                    complete: (response) => {
+                        if (response.status !== 200) {
+                            let bookmark = data.bookmarks[index];
+                            bookmark.status = response.status;
+                        }
+                        progress.loading(data.count, (data.bookmarks.length - 1));
+                        if ((data.bookmarks.length - 1) === data.count) { // 全部检查完成
+                            progress.done();
+                        }
+                        data.count++;
+                    }
+                });
+            }
         });
     }
 };
 
 var progress = {
     start: function () {
+        data.bookmarks = [];
+        $('.bookmarks ul').empty();
+        $('#clear').hide();
         $('#sort-out').addClass('active')
             .text('扫描中');
     },
     loading: function (v, max) {
-        ui.draw();
         let val = ((v / max) || 0.00).toFixed(2) * 100;
         console.log('扫描中(' + val + '%)');
         $('#sort-out').text('扫描中(' + val + '%)');
     },
     done: function () {
+        $('#clear').show();
+        ui.draw(data.bookmarks);
         ui.list();
         $('#sort-out').removeClass('active')
             .text('重新扫描');
@@ -97,16 +117,15 @@ var progress = {
 };
 
 var ui = {
-    draw: function () {
+    draw: function (bookmarks) {
         myChart.setOption({
             series: [{
                 name: '收藏数',
-                data: this._cast(data.bookmarks)
+                data: this._cast(bookmarks)
             }]
         });
     },
     list: function () {
-        $('.bookmarks ul').empty();
         let bookmarks = data.bookmarks.filter((bookmark) => { // 状态
             let status = data.where.filter.status;
             return !status.length || status.some((s) => s === bookmark.status);
@@ -165,6 +184,19 @@ var ui = {
     $('#sort-out').on('click', function () {
         progress.start();
         operations.scan();
+    });
+    $('#clear').on('click', function () {
+        if (confirm("确认清理?")) {
+            data.bookmarks.filter((bookmark) => {
+                return bookmark.status === 404;
+            }).map((bookmark, index) => {
+                chrome.bookmarks.remove(bookmark.id, () => {
+                    data.bookmarks.splice(index, 1);
+                    $('#sort-out').click();
+                    console.log("记录日志, 删除书签" + bookmark);
+                });
+            });
+        }
     });
 })();
 

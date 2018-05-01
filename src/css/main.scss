@@ -2,6 +2,7 @@
 
 $tips-color: #717375;
 $gl-blue-color: #5185EC;
+$gl-red-color: #EA4335;
 
 * {
   margin: 0;
@@ -243,6 +244,11 @@ body.app {
     color: #fff;
     background-color: $gl-blue-color;
     border-color: $gl-blue-color;
+  }
+  &.btn-error {
+    color: #fff;
+    background-color: $gl-red-color;
+    border-color: $gl-red-color;
   }
   &.btn-loading:before {
     display: block;
