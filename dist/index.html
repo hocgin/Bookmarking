@@ -23,6 +23,9 @@
 </div>
 <div class="content">
     <div class="chart">
+        <select id="range">
+            <option value="2016">--</option>
+        </select>
         <div id="container" style="width: 100%;height:260px;"></div>
         <div class="tool-bar">
             <button class="btn btn-primary" id="sort-out">
@@ -48,29 +51,12 @@
             </select>
         </div>
         <div class="sort">
-            <span class="active" data-inverse="true">新</span> / <span data-inverse="false">旧</span>
+            <span class="active" data-inverse="false">新</span> / <span data-inverse="true">旧</span>
         </div>
     </div>
     <div class="bookmarks">
         <ul>
-            <li>
-                <span class="status">200</span>
-                <i class="icon-bookmark fa fa-bookmark"></i>
-                <a class="bookmark" href="">Google</a>
-                <time class="float-right">2014-05-12</time>
-            </li>
-            <li>
-                <span class="status">200</span>
-                <i class="icon-bookmark fa fa-bookmark"></i>
-                <a class="bookmark" href="">Google</a>
-                <time class="float-right">2014-05-12</time>
-            </li>
-            <li class="remove">
-                <span class="status">200</span>
-                <i class="icon-bookmark fa fa-bookmark"></i>
-                <a class="bookmark" href="">Google</a>
-                <time class="float-right">2014-05-12</time>
-            </li>
+            <p class="tips">请点击 [开始扫描]</p>
         </ul>
     </div>
 </div>

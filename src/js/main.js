@@ -1,5 +1,5 @@
 var data = {
-    debug: true,
+    debug: false,
     /**
      * {
      *  "dateAdded": 收藏时间，
@@ -21,7 +21,7 @@ var data = {
         sort: {
             inverse: false
         },
-        year: 2018
+        years: []
     }
 
 };
@@ -56,15 +56,19 @@ var operations = {
                 , title: node.title
                 , status: 200,
             });
+
+            // Years
+            let year = new Date(node.dateAdded).getFullYear();
+            if (data.where.years.indexOf(year) === -1) {
+                data.where.years.push(year);
+            }
         });
         return data.bookmarks;
     },
     remove: function (index) {
         let bookmark = data.bookmarks[index];
-        console.log(index, bookmark);
         chrome.bookmarks.remove(bookmark.id, () => {
             data.bookmarks.splice(index, 1);
-            $('#sort-out').click();
             console.log("记录日志, 删除书签", bookmark);
         });
     },
@@ -114,13 +118,13 @@ var operations = {
         }
         data.where.filter.timeRange = timeRange;
         ui.list();
-        console.log('where', data.where);
     }
 };
 
 var progress = {
     start: function () {
         data.bookmarks = [];
+        data.where.years = [];
         $('.bookmarks ul').empty();
         $('#clear').hide();
         $('#sort-out').addClass('active')
@@ -137,15 +141,31 @@ var progress = {
         ui.list();
         $('#sort-out').removeClass('active')
             .text('重新扫描');
+
+        // 年份选择器
+        if (!!data.where.years.length) {
+            $('#range').empty();
+            data.where.years.forEach((year, index, arr) => {
+                $('#range').append(`<option value="${year}" ${(index + 1) === arr.length ? 'selected' : ''}>${year}</option>`);
+            });
+        }
     }
 };
 
 var ui = {
     draw: function (bookmarks) {
+        let preNow = new Date();
+        preNow.setFullYear(preNow.getFullYear() - 1);
         myChart.setOption({
             series: [{
                 name: '收藏数',
                 data: this._cast(bookmarks)
+            }],
+            calendar: [{
+                range: [
+                    echarts.format.formatTime('yyyy-MM-dd', preNow),
+                    echarts.format.formatTime('yyyy-MM-dd', new Date())
+                ]
             }]
         });
     },
@@ -169,9 +189,10 @@ var ui = {
             }
             return b2.dateAdded - b1.dateAdded;
         });
-        bookmarks.forEach((bookmark, index) => {
-            let time = echarts.format.formatTime('yyyy-MM-dd', bookmark.dateAdded);
-            let html = `<li class="${(bookmark.status === 404) ? 'remove' : ''}">
+        if (bookmarks.length !== 0) {
+            bookmarks.forEach((bookmark, index) => {
+                let time = echarts.format.formatTime('yyyy-MM-dd', bookmark.dateAdded);
+                let html = `<li class="${(bookmark.status === 404) ? 'remove' : ''}">
                         <sup class="status ${{200: 'success', 404: 'error'}[bookmark.status]}">${bookmark.status}</sup>
                         <i class="icon-bookmark fa fa-bookmark"></i>
                         <span>
@@ -180,9 +201,21 @@ var ui = {
                         <time class="float-right">${time} <i class="icon-trash fa fa-trash-o fa-lg" data-index="${index}"></i></time>
                         
                     </li>`;
+                $('.bookmarks ul').append(html);
+            });
+        }else {
+            let html = `
+            <p class="tips">囧. 暂无书签</p>
+            `;
             $('.bookmarks ul').append(html);
+        }
+    },
+    changeYear: function (year) {
+        myChart.setOption({
+            calendar: [{
+                range: year
+            }]
         });
-
     },
     /**
      * 转化数据格式
@@ -218,6 +251,7 @@ window.onload = function () {
             }).map((bookmark, index) => {
                 operations.remove(index);
             });
+            $('#sort-out').click();
         }
     });
     $(document).on('click', '.bookmarks ul li .icon-trash', (e) => {
@@ -226,6 +260,7 @@ window.onload = function () {
         if (confirm('确定删除?')) {
             operations.remove(index)
         }
+        $('#sort-out').click();
     });
     $(document).on('change', '#status-code, #time-range', (e) => {
         operations.where();
@@ -237,6 +272,15 @@ window.onload = function () {
     }).on('keydown', '#search', () => {
         operations.where();
     });
+    $(document).on('change', '#range', (e) => {
+        let $target = $(e.target);
+        let year = $target.val();
+        if (!!year) {
+            ui.changeYear(year);
+        }
+    });
+
+
     let now = new Date();
     $('#time-range').append(`<option value="${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay())},${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-' + (now.getDay() + 1))}">今天</option>`)
         .append(`<option value="${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-1')},${Date.parse(now.getFullYear() + '-' + (now.getMonth() + 1) + '-1')}">本月</option>`)

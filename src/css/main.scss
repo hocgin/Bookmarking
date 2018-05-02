@@ -66,6 +66,12 @@ body.app {
         width: 100%;
         text-align: center;
       }
+      #range {
+        position: absolute;
+        top: 50px;
+        right: 25px;
+        z-index: 1000;
+      }
     }
     .filters {
       display: flex;
@@ -76,7 +82,7 @@ body.app {
       // 过滤
       .filter {
         align-self: flex-start;
-        select{
+        select {
           outline: 0;
         }
         input.search {
@@ -110,6 +116,12 @@ body.app {
     // 书签Box
     .bookmarks {
       padding: 10px 20px;
+      .tips {
+        text-align: center;
+        font-size: 2em;
+        height: 400px;
+        line-height: 400px
+      }
       ul li {
         list-style: none;
         margin: 5px 0;
@@ -136,7 +148,7 @@ body.app {
           i.icon-bookmark {
             color: #F2BE42;
           }
-          i.icon-trash{
+          i.icon-trash {
             color: #dc3545;
             vertical-align: inherit;
           }
@@ -272,7 +284,8 @@ body.app {
     }
   }
 }
-a.static,a:hover {
+
+a.static, a:hover {
   color: #040808
 }
 
@@ -281,7 +294,6 @@ footer p {
   font-size: 14px;
   text-align: center
 }
-
 
 .float-right {
   float: right;
