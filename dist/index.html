@@ -37,21 +37,18 @@
     </div>
     <div class="filters">
         <div class="filter">
-            <input id="search" class="search" type="text" placeholder="关键字">
-            <select>
+            <input id="search" class="search" type="text" placeholder="关键字" value="">
+            <select id="status-code">
                 <option value="">状态码</option>
                 <option value="200">200</option>
                 <option value="404">404</option>
             </select>
-            <select>
+            <select id="time-range">
                 <option value="">时间范围</option>
-                <option value="">今天</option>
-                <option value="">这个月</option>
-                <option value="">今年</option>
             </select>
         </div>
         <div class="sort">
-            <a class="active" href="javascript:;;">新</a> / <a href="javascript:;;">旧</a>
+            <span class="active" data-inverse="true">新</span> / <span data-inverse="false">旧</span>
         </div>
     </div>
     <div class="bookmarks">

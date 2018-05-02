@@ -99,6 +99,22 @@ var operations = {
                 });
             }
         });
+    },
+    where: function () {
+        data.where.filter.key = $('#search').val() || '';
+        data.where.sort.inverse = $('.sort span.active').data('inverse');
+        let status = ($('#status-code').val() || '').split(',');
+        if (status.indexOf('') !== -1) {
+            status = [];
+        }
+        data.where.filter.status = status;
+        let timeRange = ($('#time-range').val() || '').split(',');
+        if (timeRange.indexOf('') !== -1) {
+            timeRange = [];
+        }
+        data.where.filter.timeRange = timeRange;
+        ui.list();
+        console.log('where', data.where);
     }
 };
 
@@ -134,15 +150,16 @@ var ui = {
         });
     },
     list: function () {
+        $('.bookmarks ul').empty();
         let bookmarks = data.bookmarks.filter((bookmark) => { // 状态
             let status = data.where.filter.status;
-            return !status.length || status.some((s) => s === bookmark.status);
+            return !status.length || status.some((s) => s == bookmark.status);
         }).filter((bookmark) => {
             let timeRange = data.where.filter.timeRange;
             let start = timeRange[0] || 0;
             let end = timeRange[1] || 99999999999999;
-            console.log(bookmark.dateAdded);
-            return bookmark.dateAdded >= start && bookmark.dateAdded <= end;
+            let dateAdded = bookmark.dateAdded;
+            return dateAdded >= start && dateAdded <= end;
         }).filter((bookmark) => {
             let key = data.where.filter.key;
             return !key || new RegExp(key).test(bookmark.title);
@@ -210,6 +227,20 @@ window.onload = function () {
             operations.remove(index)
         }
     });
+    $(document).on('change', '#status-code, #time-range', (e) => {
+        operations.where();
+    }).on('click', '.sort span', (e) => {
+        let $that = $(e.target);
+        $('.sort span').removeClass('active');
+        $that.addClass('active');
+        operations.where();
+    }).on('keydown', '#search', () => {
+        operations.where();
+    });
+    let now = new Date();
+    $('#time-range').append(`<option value="${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay())},${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-' + (now.getDay() + 1))}">今天</option>`)
+        .append(`<option value="${Date.parse(now.getFullYear() + '-' + now.getMonth() + '-1')},${Date.parse(now.getFullYear() + '-' + (now.getMonth() + 1) + '-1')}">本月</option>`)
+        .append(`<option value="${Date.parse(now.getFullYear() + '-1' + '-1')},${Date.parse((now.getFullYear() + 1) + '-1' + '-1')}">今年</option>`);
 };
 
 
@@ -259,3 +290,13 @@ option = {
     }]
 };
 myChart.setOption(option);
+myChart.on('click', (params) => {
+    let time = params.data[0];
+    let date = new Date(time);
+    let now = Date.parse(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate());
+    data.where.filter.timeRange = [
+        now,
+        now + 3600 * 24 * 1000
+    ];
+    ui.list();
+});

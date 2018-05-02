@@ -94,14 +94,15 @@ body.app {
       // 排序
       .sort {
         align-self: flex-end;
-        a,
-        a:hover,
-        a:visited,
-        a:active {
+        cursor: pointer;
+        span,
+        span:hover,
+        span:visited,
+        span:active {
           text-decoration: none;
           color: $gl-blue-color;
         }
-        a.active {
+        span.active {
           font-weight: bold;
         }
       }
