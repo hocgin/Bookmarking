@@ -37,11 +37,18 @@ gulp.task('compressJS', function () {
         .pipe(browserSync.stream());
 });
 
+gulp.task('compressLibs', function () {
+    gulp.src('src/libs/**')
+        .pipe(gulp.dest('dist/libs'))
+        .pipe(browserSync.stream());
+});
+
 // Watch files for changes & recompile
 gulp.task('watch', function () {
     gulp.watch(['src/css/*.scss'], ['compressCSS']);
     gulp.watch(['src/js/*.js'], ['compressJS']);
+    gulp.watch(['src/libs/*'], ['compressLibs']);
 });
 
 // Default task, running just `gulp` will move font, compress js and scss, start server, watch files.
-gulp.task('default', ['compressCSS', 'compressJS', 'browser-sync', 'watch']);
+gulp.task('default', ['compressLibs', 'compressCSS', 'compressJS', 'browser-sync', 'watch']);
