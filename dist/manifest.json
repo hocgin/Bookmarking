@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Bookmarking",
+  "description": "Bookmarking.",
+  "version": "0.0.1",
+  "browser_action": {
+  },
+  "background": {
+    "scripts": [
+      "js/background.min.js"
+    ]
+  },
+  "permissions": [
+    "bookmarks",
+    "http://*/*",
+    "https://*/*"
+  ]
+}
