@@ -8,3 +8,6 @@
 
 ## 界面
 ![image](https://user-images.githubusercontent.com/16535610/39533369-6f482da4-4e61-11e8-8290-97d332dfe4d7.png)
+
+## License
+[LICENSE](LICENSE)
