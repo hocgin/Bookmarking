@@ -59,9 +59,17 @@ var operations = {
         });
         return data.bookmarks;
     },
+    remove: function (index) {
+        let bookmark = data.bookmarks[index];
+        console.log(index, bookmark);
+        chrome.bookmarks.remove(bookmark.id, () => {
+            data.bookmarks.splice(index, 1);
+            $('#sort-out').click();
+            console.log("记录日志, 删除书签", bookmark);
+        });
+    },
     _checkUrls: function () {
         data.bookmarks.forEach((bookmark, index) => {
-            console.log(data.bookmarks.length);
             if (data.debug) {
                 let bookmark = data.bookmarks[index];
                 bookmark.status = [200, 500, 404, 0, 501][Math.floor(Math.random() * 4)];
@@ -144,15 +152,16 @@ var ui = {
             }
             return b2.dateAdded - b1.dateAdded;
         });
-        bookmarks.forEach((bookmark) => {
+        bookmarks.forEach((bookmark, index) => {
             let time = echarts.format.formatTime('yyyy-MM-dd', bookmark.dateAdded);
             let html = `<li class="${(bookmark.status === 404) ? 'remove' : ''}">
-                        <i class="icon fa fa-bookmark"></i>
+                        <sup class="status ${{200: 'success', 404: 'error'}[bookmark.status]}">${bookmark.status}</sup>
+                        <i class="icon-bookmark fa fa-bookmark"></i>
                         <span>
                             <a class="bookmark" href="${bookmark.url}" target="_blank" alt="${bookmark.title}">${bookmark.title}</a>
-                            <sup class="status ${{200: 'success', 404: 'error'}[bookmark.status]}">${bookmark.status}</sup>
                         </span>
-                        <time class="float-right">${time}</time>
+                        <time class="float-right">${time} <i class="icon-trash fa fa-trash-o fa-lg" data-index="${index}"></i></time>
+                        
                     </li>`;
             $('.bookmarks ul').append(html);
         });
@@ -180,25 +189,28 @@ var ui = {
     }
 };
 
-(() => {
-    $('#sort-out').on('click', function () {
+window.onload = function () {
+    $('#sort-out').on('click', () => {
         progress.start();
         operations.scan();
     });
-    $('#clear').on('click', function () {
+    $('#clear').on('click', () => {
         if (confirm("确认清理?")) {
             data.bookmarks.filter((bookmark) => {
                 return bookmark.status === 404;
             }).map((bookmark, index) => {
-                chrome.bookmarks.remove(bookmark.id, () => {
-                    data.bookmarks.splice(index, 1);
-                    $('#sort-out').click();
-                    console.log("记录日志, 删除书签" + bookmark);
-                });
+                operations.remove(index);
             });
         }
     });
-})();
+    $(document).on('click', '.bookmarks ul li .icon-trash', (e) => {
+        let $that = $(e.target);
+        let index = $that.data('index');
+        if (confirm('确定删除?')) {
+            operations.remove(index)
+        }
+    });
+};
 
 
 var myChart = echarts.init($('#container')[0]);

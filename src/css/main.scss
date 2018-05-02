@@ -115,7 +115,7 @@ body.app {
         cursor: pointer;
         border-bottom: 1px dashed #ebebeb;
         sup.status {
-          vertical-align: top;
+          vertical-align: text-bottom;
           width: 2em;
           text-align: center;
           display: inline-block;
@@ -132,8 +132,12 @@ body.app {
         }
         // 书签正常状态
         & {
-          i.icon {
+          i.icon-bookmark {
             color: #F2BE42;
+          }
+          i.icon-trash{
+            color: #dc3545;
+            vertical-align: inherit;
           }
           a.bookmark {
             vertical-align: text-bottom;
@@ -147,7 +151,7 @@ body.app {
             display: inline-block;
           }
           &:hover {
-            .icon, .bookmark, time {
+            .icon-bookmark {
               color: #E7E9ED;
             }
             .bookmark {
@@ -157,14 +161,14 @@ body.app {
         }
         // 删除状态
         &.remove {
-          .icon, .bookmark, time {
+          .icon-bookmark, .bookmark, time {
             color: #E7E9ED;
           }
           .bookmark {
             text-decoration: line-through;
           }
           &:hover {
-            .icon {
+            .icon-bookmark {
               color: #F2BE42;
             }
             .bookmark {
