@@ -72,7 +72,6 @@ var operations = {
                 indexes.push(index);
             }
         });
-        console.log(data.bookmarks);
         // 从后面开始删除
         indexes.reverse().forEach((item, index) => {
             let bookmark = data.bookmarks[item];
