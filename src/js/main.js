@@ -65,17 +65,33 @@ var operations = {
         });
         return data.bookmarks;
     },
-    remove: function (index) {
-        let bookmark = data.bookmarks[index];
-        chrome.bookmarks.remove(bookmark.id, () => {
-            data.bookmarks.splice(index, 1);
-            console.log("记录日志, 删除书签", bookmark);
+    remove: function (IDs) {
+        let indexes = []; // 待删除下标
+        data.bookmarks.forEach((bookmark, index) => {
+            if (IDs.includes(bookmark.id)) {
+                indexes.push(index);
+            }
         });
+        console.log(data.bookmarks);
+        // 从后面开始删除
+        indexes.reverse().forEach((item, index) => {
+            let bookmark = data.bookmarks[item];
+            console.log(bookmark);
+            chrome.bookmarks.remove(bookmark.id, () => {
+                data.bookmarks.splice(item, 1);
+                console.log('TODO: 记录日志, 删除书签',
+                    bookmark.status,
+                    bookmark);
+                if (index === (indexes.length - 1)) { // 最后一个
+                    ui.list();
+                }
+            });
+        });
+
     },
     _checkUrls: function () {
-        data.bookmarks.forEach((bookmark, index) => {
+        data.bookmarks.forEach((bookmark) => {
             if (data.debug) {
-                let bookmark = data.bookmarks[index];
                 bookmark.status = [200, 500, 404, 0, 501][Math.floor(Math.random() * 4)];
                 progress.loading(data.count, (data.bookmarks.length - 1));
                 if ((data.bookmarks.length - 1) === data.count) { // 全部检查完成
@@ -91,7 +107,6 @@ var operations = {
                     url: bookmark.url,
                     complete: (response) => {
                         if (response.status !== 200) {
-                            let bookmark = data.bookmarks[index];
                             bookmark.status = response.status;
                         }
                         progress.loading(data.count, (data.bookmarks.length - 1));
@@ -108,12 +123,12 @@ var operations = {
         data.where.filter.key = $('#search').val() || '';
         data.where.sort.inverse = $('.sort span.active').data('inverse');
         let status = ($('#status-code').val() || '').split(',');
-        if (status.indexOf('') !== -1) {
+        if (status.includes('')) {
             status = [];
         }
         data.where.filter.status = status;
         let timeRange = ($('#time-range').val() || '').split(',');
-        if (timeRange.indexOf('') !== -1) {
+        if (timeRange.includes('')) {
             timeRange = [];
         }
         data.where.filter.timeRange = timeRange;
@@ -198,12 +213,12 @@ var ui = {
                         <span>
                             <a class="bookmark" href="${bookmark.url}" target="_blank" alt="${bookmark.title}">${bookmark.title}</a>
                         </span>
-                        <time class="float-right">${time} <i class="icon-trash fa fa-trash-o fa-lg" data-index="${index}"></i></time>
+                        <time class="float-right">${time} <i class="icon-trash fa fa-trash-o fa-lg" data-id="${bookmark.id}"></i></time>
                         
                     </li>`;
                 $('.bookmarks ul').append(html);
             });
-        }else {
+        } else {
             let html = `
             <p class="tips">囧. 暂无书签</p>
             `;
@@ -246,21 +261,20 @@ window.onload = function () {
     });
     $('#clear').on('click', () => {
         if (confirm("确认清理?")) {
-            data.bookmarks.filter((bookmark) => {
+            let IDs = data.bookmarks.filter((bookmark) => {
                 return bookmark.status === 404;
             }).map((bookmark, index) => {
-                operations.remove(index);
+                return bookmark.id;
             });
-            $('#sort-out').click();
+            operations.remove(IDs);
         }
     });
     $(document).on('click', '.bookmarks ul li .icon-trash', (e) => {
         let $that = $(e.target);
-        let index = $that.data('index');
+        let id = $that.data('id');
         if (confirm('确定删除?')) {
-            operations.remove(index)
+            operations.remove([id+'']);
         }
-        $('#sort-out').click();
     });
     $(document).on('change', '#status-code, #time-range', (e) => {
         operations.where();
